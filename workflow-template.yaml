@@ -1,0 +1,157 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+
+metadata:
+  name: pytorch-training-gpu
+  namespace: ml
+
+spec:
+  # ============================================================
+  # Workflow 基础配置
+  # ============================================================
+
+  # Workflow 入口
+  entrypoint: train
+
+  # Workflow RBAC
+  serviceAccountName: argo-workflow
+
+  # ============================================================
+  # 参数
+  # ============================================================
+  #
+  # image：
+  #   由 GitLab CI 提交时传入
+  #
+  # epochs / batch-size / learning-rate / num-workers：
+  #   提供平台默认值
+  #   GitLab CI 不需要每次都传
+  #   Argo UI 手动提交时可以覆盖
+  #
+  arguments:
+    parameters:
+      # CI/CD 最重要的参数
+      - name: image
+        value: ""
+
+      # 训练默认参数
+      - name: epochs
+        value: "1"
+
+      - name: batch-size
+        value: "64"
+
+      - name: learning-rate
+        value: "0.001"
+
+      - name: num-workers
+        value: "2"
+
+  # ============================================================
+  # 镜像拉取凭据
+  # ============================================================
+  imagePullSecrets:
+    - name: gitlab-registry
+
+  # ============================================================
+  # Workflow 生命周期
+  # ============================================================
+
+  # 单个训练任务最长运行 1 小时
+  activeDeadlineSeconds: 3600
+
+  # 失败任务最多重试 2 次
+  retryStrategy:
+    limit: "2"
+    retryPolicy: "Always"
+
+  # Workflow 完成后自动删除 Pod
+  podGC:
+    strategy: OnWorkflowCompletion
+
+  # ============================================================
+  # Templates
+  # ============================================================
+  templates:
+    # ==========================================================
+    # GPU Training
+    # ==========================================================
+    - name: train
+
+      # --------------------------------------------------------
+      # GPU 节点选择
+      # --------------------------------------------------------
+      nodeSelector:
+        gputype: rtx5060
+
+      # --------------------------------------------------------
+      # Training Container
+      # --------------------------------------------------------
+      container:
+        image: "{{workflow.parameters.image}}"
+
+        workingDir: /app
+
+        command:
+          - python
+
+        args:
+          - train.py
+
+          - --epochs
+          - "{{workflow.parameters.epochs}}"
+
+          - --batch-size
+          - "{{workflow.parameters.batch-size}}"
+
+          - --learning-rate
+          - "{{workflow.parameters.learning-rate}}"
+
+          - --num-workers
+          - "{{workflow.parameters.num-workers}}"
+
+        # ------------------------------------------------------
+        # GPU / CPU / Memory
+        # ------------------------------------------------------
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+            nvidia.com/gpu: "1"
+
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+            nvidia.com/gpu: "1"
+
+      # ========================================================
+      # 注意：
+      #
+      # 当前 GPU 节点没有配置 taint，
+      # 所以这里不需要 tolerations。
+      #
+      # 如果以后生产环境 GPU Node 配置：
+      #
+      # gputype=rtx5060:NoSchedule
+      #
+      # 再增加：
+      #
+      # tolerations:
+      #   - key: gputype
+      #     operator: Equal
+      #     value: rtx5060
+      #     effect: NoSchedule
+      #
+      # ========================================================
+
+      # ========================================================
+      # Artifact 暂时不启用
+      #
+      # 后续接入 MLflow / MinIO 后再处理：
+      #
+      # outputs:
+      #   artifacts:
+      #     - name: model
+      #       path: /output/model.pth
+      #
+      # ========================================================
