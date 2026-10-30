@@ -149,9 +149,9 @@ spec:
       #
       # 后续接入 MLflow / MinIO 后再处理：
       #
-      # outputs:
-      #   artifacts:
-      #     - name: model
-      #       path: /output/model.pth
+      outputs:
+        artifacts:
+          - name: model
+            path: /output/model.pth
       #
       # ========================================================
