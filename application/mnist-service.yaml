@@ -2,16 +2,16 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: mnist-service-app
-  namespace: argocd
+  namespace: argo
 spec:
   project: default
   source:
-    repoURL: "https://github.com/your-username/your-pytorch-repo.git" # 业务代码/Helm 仓库
+    repoURL: "http://gitlab.192.168.31.202.nip.io/devops/pytorch-k8s-training.git" # 业务代码/Helm 仓库
     targetRevision: dev_v1.0.0
     path: helm/mnist-service # Helm Chart 路径
   destination:
     server: "https://kubernetes.default.svc"
-    namespace: ml-prod
+    namespace: default
   syncPolicy:
     automated:
       prune: true
