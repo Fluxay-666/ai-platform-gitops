@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root-app-controller # 根应用的名称
+  namespace: argo # 必须在 argocd 命名空间
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: "https://github.com/Fluxay-666/ai-platform-gitops.git" # 你的 GitOps 仓库地址
+    targetRevision: HEAD
+    path: applications # 指向存放所有子应用 YAML 的目录
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: argo # 子应用通常也注册在 argocd 空间
+  syncPolicy:
+    automated:
+      prune: true # 允许自动清理
+      selfHeal: true # 开启自愈
