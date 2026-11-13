@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ml
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+
+metadata:
+  name: argo-workflow-edit
+  namespace: ml
+
+subjects:
+  - kind: ServiceAccount
+    name: argo-workflow
+    namespace: ml
+
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: argo-workflows-edit
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gitlab-registry
+  namespace: ml
+type: kubernetes.io/dockerconfigjson
+# 这里存放你的私有仓库登录信息（注意：请使用你自己真实的 Base64 字符串替换下方的内容）
+# 生成方式：echo -n '{"auths":{"registry.192.168.31.202.nip.io":{"username":"你的用户名","password":"你的密码"}}}' | base64
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJyZWdpc3RyeS4xOTIuMTY4LjMxLjIwMi5uaXAuaW8iOnsidXNlcm5hbWUiOiJhZG1pbiIsInBhc3N3b3JkIjoiMTIzNDU2In19fQ==
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argo-workflow
+  namespace: ml
+# 🌟 关键核心配置：在这里挂载上面的 Secret 之后，使用此账号的 Pod 将自动获得拉取权限
+imagePullSecrets:
+  - name: gitlab-registry
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: argoflow-gitlab-minio-storage-secret
+  namespace: ml # 先在 argo 命名空间创建
+type: Opaque
+stringData:
+  accessKey: "HxOpdBj3mXfGb9CP8yA2nqBkABNt6cQYbYUSRwgFiigEl8UFJE7RNXuojLpNXTVq"
+  secretKey: "jZdYLFtMpyO1B4KAc4ABvCHmlNApNEdc4Ngh47Kedxz9xaNwPTyt4sHUh67x5UxN"
