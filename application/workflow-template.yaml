@@ -153,5 +153,13 @@ spec:
         artifacts:
           - name: model
             path: /output/model.pth
+            s3:
+              bucket: argo-artifacts
+              # 💡 自定义路径：你可以写固定的路径，或者结合 workflow 变量
+              # key: "train/model.tgz"
+              key: "train/{{workflow.creationTimestamp}}/model.tgz"
+            # 或者按时间戳隔离：key: "train/{{workflow.creationTimestamp}}/model.tgz"
+          # - name: model
+          #   path: /output/model.pth
       #
       # ========================================================
