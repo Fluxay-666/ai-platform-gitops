@@ -3,6 +3,16 @@ kind: Application
 metadata:
   name: mnist-service-app
   namespace: argo
+  annotations:
+    # 1. 指定需要监控的镜像别名与仓库地址
+    argocd-image-updater.argoproj.io/image-list: mnist=registry.192.168.31.202.nip.io/devops/pytorch-k8s-training
+    # 2. 更新策略：newest-build 表示按最新构建推送时间自动拉取
+    argocd-image-updater.argoproj.io/mnist.update-strategy: newest-build
+    # 3. 告诉 Updater 自动把新标签注入到 Helm 的哪个参数路径下 标准化参数名可省略
+    # argocd-image-updater.argoproj.io/mnist.helm.image-name: image.repository
+    # argocd-image-updater.argoproj.io/mnist.helm.image-tag: image.tag
+    # 4. 指定拉取私有仓库所需的 Secret（格式：命名空间/Secret名称）
+    argocd-image-updater.argoproj.io/mnist.pull-secret: pullsecret:ml/gitlab-registry-secret
 spec:
   project: default
   source:
