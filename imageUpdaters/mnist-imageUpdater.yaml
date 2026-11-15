@@ -6,7 +6,7 @@ metadata:
 spec:
   namespace: ml
   applicationRefs:
-    - namePattern: "mnist-service-app"
+    - namePattern: "mnist-*"
       images:
         - alias: "mnist"
           imageName: "registry.192.168.31.202.nip.io/devops/pytorch-k8s-training"
