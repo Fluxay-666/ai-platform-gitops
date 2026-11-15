@@ -2,9 +2,9 @@ apiVersion: argocd-image-updater.argoproj.io/v1alpha1
 kind: ImageUpdater
 metadata:
   name: mnist-service-updater
-  namespace: argo
+  namespace: ml
 spec:
-  namespace: argo
+  namespace: ml
   applicationRefs:
     - namePattern: "mnist-service-app"
       images:
