@@ -7,10 +7,14 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  source:
-    repoURL: "https://github.com/Fluxay-666/ai-platform-gitops.git" # 你的 GitOps 仓库地址
-    targetRevision: HEAD
-    path: applications # 指向存放所有子应用 YAML 的目录
+  # 注意：将原来的 source 改为复数 sources（数组列表）
+  sources:
+    - repoURL: "https://github.com/Fluxay-666/ai-platform-gitops.git" # 你的 GitOps 仓库地址
+      targetRevision: HEAD
+      path: applications # 指向存放所有子应用 YAML 的目录
+    - repoURL: "https://github.com/Fluxay-666/ai-platform-gitops.git" # 你的 GitOps 仓库地址
+      targetRevision: HEAD
+      path: imageUpdaters # 指向存放所有子应用 YAML 的目录
   destination:
     server: "https://kubernetes.default.svc"
     namespace: argo # 子应用通常也注册在 argocd 空间
