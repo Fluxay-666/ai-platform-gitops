@@ -4,7 +4,7 @@ metadata:
   name: mnist-service-updater
   namespace: ml
 spec:
-  namespace: ml
+  # namespace: ml
   applicationRefs:
     - namePattern: "mnist-*"
       images:
