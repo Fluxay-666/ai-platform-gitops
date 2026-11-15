@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: mnist-service-app
-  namespace: ml
+  namespace: argo
   annotations:
     # 1. 指定需要监控的镜像别名与仓库地址
     argocd-image-updater.argoproj.io/image-list: mnist=registry.192.168.31.202.nip.io/devops/pytorch-k8s-training
