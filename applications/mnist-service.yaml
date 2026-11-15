@@ -12,7 +12,7 @@ metadata:
     # argocd-image-updater.argoproj.io/mnist.helm.image-name: image.repository
     # argocd-image-updater.argoproj.io/mnist.helm.image-tag: image.tag
     # 4. 指定拉取私有仓库所需的 Secret（格式：命名空间/Secret名称）
-    argocd-image-updater.argoproj.io/mnist.pull-secret: pullsecret:ml/gitlab-registry-secret
+    argocd-image-updater.argoproj.io/mnist.pull-secret: pullsecret:ml/gitlab-registry
 spec:
   project: default
   source:
