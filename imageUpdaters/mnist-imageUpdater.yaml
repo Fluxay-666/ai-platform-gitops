@@ -16,4 +16,4 @@ spec:
               tag: "image.tag"
           commonUpdateSettings:
             updateStrategy: "newest-build"
-            pullSecret: "pullsecret:ml/gitlab-registry"
+            pullSecret: "pullsecret:argo/gitlab-registry"
